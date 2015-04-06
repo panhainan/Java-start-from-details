@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="X-UA-Compatible" content="IE=8" /><title>Java中间缓存变量机制</title><style type="text/css" id="wiz_phone_default_css"> body {margin: 8px 12px;padding: 0;font-size: 17px;line-height: 1.5em;}p {letter-spacing:1.5px;text-indent: 2em;line-height: 1.5em;}</style><style type="text/css" id="wiz_todo_style_id" wiz_link_version="01.00.09">.wiz-todo, .wiz-todo-img {width: 16px; height: 16px; cursor: default; padding: 0 10px 0 2px; vertical-align: -10%;-webkit-user-select: none;} .wiz-todo-label { display: inline-block; padding-top: 7px; padding-bottom: 6px; line-height: 1.5;} .wiz-todo-label-checked {  color: #666;} .wiz-todo-label-unchecked {text-decoration: initial;} .wiz-todo-completed-info {padding-left: 44px; display: inline-block; } .wiz-todo-avatar { width:20px; height: 20px; vertical-align: -20%; margin-right:10px; border-radius: 2px;} .wiz-todo-account, .wiz-todo-dt { color: #666; }</style>
+<style type="text/css" id="wiz_custom_css">
+body
+{
+    font-family: Consolas;
+    font-size: 14pt;
+    line-height: 1.5;
+}
+html, body
+{
+    color: black;
+    background-color: white;
+}
+h1 {
+    font-size:1.5em;
+    font-weight:bold;
+}
+h2 {
+    font-size:1.4em;
+    font-weight:bold;
+}
+h3 {
+    font-size:1.3em;
+    font-weight:bold;
+}
+h4 {
+    font-size:1.2em;
+    font-weight:bold;
+}
+h5 {
+    font-size:1.1em;
+    font-weight:bold;
+}
+h6 {
+    font-size:1.0em;
+    font-weight:bold;
+}
+img {
+    border:0;
+    max-width: 100%;
+}
+blockquote {
+    margin-top:0px;
+    margin-bottom:0px;
+}
+table {
+    border-collapse:collapse;
+    border:1px solid #bbbbbb;
+}
+td {
+    border-collapse:collapse;
+    border:1px solid #bbbbbb;
+}
+</style>
+<link type="text/css" rel="stylesheet" id="wiz_code_highlight_link" href="Java中间缓存变量机制_files/wiz_code_highlight_18.css"></head><body  style=""><div>刚刚看了一篇文章，终于搞懂了java中间缓存变量机制</div><div>它只适用于单个表达式，直接看下面的代码吧，应该很好懂，写了注释</div><div><span style="color: rgb(147, 161, 161); font-family: Consolas, 'Liberation Mono', Menlo, Courier, monospace; font-size: 13px; line-height: 18px; white-space: pre; background-color: rgb(247, 247, 249);"><a href="http://blog.csdn.net/waycaiqi/article/details/43486249">http://blog.csdn.net/waycaiqi/article/details/43486249</a></span><br></div><div><div><pre class="prettyprint linenums prettyprinted"><ol class="linenums" style="padding-left: 0px;"><li style="list-style-type: none; padding-left: 0px;" class="L0"><code class="language-java"><span class="kwd">package</span><span class="pln"> org</span><span class="pun">.</span><span class="pln">phn</span><span class="pun">.</span><span class="pln">java</span><span class="pun">.</span><span class="pln">iplusplus</span><span class="pun">;</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L1"><code class="language-java"></code></li><li style="list-style-type: none; padding-left: 0px;" class="L2"><code class="language-java"><span class="com">/**</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L3"><code class="language-java"><span class="com"> * @author phn</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L4"><code class="language-java"><span class="com"> * @TODO 中间缓存变量机制,只适用于单个表达式</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L5"><code class="language-java"><span class="com"> */</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L6"><code class="language-java"><span class="kwd">public</span><span class="pln"> </span><span class="kwd">class</span><span class="pln"> </span><span class="typ">IntermediateCacheVariable</span><span class="pln"> </span><span class="pun">{</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L7"><code class="language-java"></code></li><li style="list-style-type: none; padding-left: 0px;" class="L8"><code class="language-java"><span class="pln">	</span><span class="kwd">public</span><span class="pln"> </span><span class="kwd">static</span><span class="pln"> </span><span class="kwd">void</span><span class="pln"> main</span><span class="pun">(</span><span class="typ">String</span><span class="pun">[]</span><span class="pln"> args</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L9"><code class="language-java"><span class="pln">		test01</span><span class="pun">();</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L0"><code class="language-java"><span class="pln">		test02</span><span class="pun">();</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L1"><code class="language-java"><span class="pln">	</span><span class="pun">}</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L2"><code class="language-java"></code></li><li style="list-style-type: none; padding-left: 0px;" class="L3"><code class="language-java"><span class="pln">	</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L4"><code class="language-java"><span class="pln">	</span><span class="com">/**</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L5"><code class="language-java"><span class="com">	 * 可以参看这篇文章：http://blog.csdn.net/waycaiqi/article/details/43486249</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L6"><code class="language-java"><span class="com">	 */</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L7"><code class="language-java"><span class="pln">	</span><span class="kwd">public</span><span class="pln"> </span><span class="kwd">static</span><span class="pln"> </span><span class="kwd">void</span><span class="pln"> test01</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L8"><code class="language-java"><span class="pln">		</span><span class="kwd">int</span><span class="pln"> j </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">;</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L9"><code class="language-java"><span class="pln">		</span><span class="kwd">for</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">int</span><span class="pln"> i </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">;</span><span class="pln"> i </span><span class="pun">&lt;</span><span class="pln"> </span><span class="lit">100</span><span class="pun">;</span><span class="pln"> i</span><span class="pun">++)</span><span class="pln"> </span><span class="pun">{</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L0"><code class="language-java"><span class="pln">			j </span><span class="pun">=</span><span class="pln"> j</span><span class="pun">++;</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L1"><code class="language-java"><span class="pln">			</span><span class="com">//temp = j; j = j+1; 到这里是j++的操作</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L2"><code class="language-java"><span class="pln">			</span><span class="com">//j=temp; 这里是j的赋值操作</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L3"><code class="language-java"><span class="pln">		</span><span class="pun">}</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L4"><code class="language-java"><span class="pln">		</span><span class="typ">System</span><span class="pun">.</span><span class="pln">out</span><span class="pun">.</span><span class="pln">println</span><span class="pun">(</span><span class="pln">j</span><span class="pun">);</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L5"><code class="language-java"><span class="pln">	</span><span class="pun">}</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L6"><code class="language-java"></code></li><li style="list-style-type: none; padding-left: 0px;" class="L7"><code class="language-java"><span class="pln">	</span><span class="kwd">public</span><span class="pln"> </span><span class="kwd">static</span><span class="pln"> </span><span class="kwd">void</span><span class="pln"> test02</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L8"><code class="language-java"><span class="pln">		</span><span class="kwd">int</span><span class="pln"> j </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">;</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L9"><code class="language-java"><span class="pln">		</span><span class="kwd">for</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">int</span><span class="pln"> i </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">;</span><span class="pln"> i </span><span class="pun">&lt;</span><span class="pln"> </span><span class="lit">100</span><span class="pun">;</span><span class="pln"> i</span><span class="pun">++)</span><span class="pln"> </span><span class="pun">{</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L0"><code class="language-java"><span class="pln">			j </span><span class="pun">=</span><span class="pln"> </span><span class="pun">++</span><span class="pln">j</span><span class="pun">;</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L1"><code class="language-java"><span class="pln">			</span><span class="com">//j=j+1;temp=j;</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L2"><code class="language-java"><span class="pln">			</span><span class="com">//j=temp;</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L3"><code class="language-java"><span class="pln">		</span><span class="pun">}</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L4"><code class="language-java"><span class="pln">		</span><span class="typ">System</span><span class="pun">.</span><span class="pln">out</span><span class="pun">.</span><span class="pln">println</span><span class="pun">(</span><span class="pln">j</span><span class="pun">);</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L5"><code class="language-java"><span class="pln">	</span><span class="pun">}</span></code></li><li style="list-style-type: none; padding-left: 0px;" class="L6"><code class="language-java"><span class="pun">}</span></code></li></ol></pre></div><div><br></div></div></body></html>
